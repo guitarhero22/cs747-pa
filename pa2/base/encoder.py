@@ -10,6 +10,4 @@ if __name__ == '__main__':
 
     maze = Maze(args.grid)
 
-    # maze.show_grid()
-
-    maze.to_mdp()
+    maze.write_mdp(100000, -100000, -1, discount = 0.9)

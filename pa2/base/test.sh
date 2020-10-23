@@ -1,6 +1,6 @@
 echo "Encoding..."
 python encoder.py --grid $1 > mdpFile
-# echo "Pilot run..."
+echo "Pilot run..."
 # python planner.py --mdp mdpFile --algorithm $2
 # read -n 1 -s
 echo "Final Run..."
