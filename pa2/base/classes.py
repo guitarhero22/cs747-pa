@@ -164,17 +164,19 @@ class Maze:
                     self.decode[self.nstates] = (i,j)
                     self.nstates += 1
             
-            self.start = [self.encode[i] for i in self.start][0]
-            self.end = [self.encode[i] for i in self.end][0]
+            self.en_start = [self.encode[i] for i in self.start]
+            self.en_end = [self.encode[i] for i in self.end]
             # print(self.start, self.end)
 
     def write_mdp(self, good_reward = 10000, bad_reward = -10000, normal_reward = -1, discount = 1):
 
+        end_st = self.en_end[0]
+
         print('numStates', self.nstates)
         print('numActions', 4)
         
-        print('start', self.start)
-        print('end', self.end)
+        print('start', ' '.join([str(i) for i in self.en_start]))
+        print('end', ' '.join([str(i) for i in self.en_end]))
 
         transitions = []
 
@@ -193,17 +195,17 @@ class Maze:
                     x1, y1 = x + a[0], y + a[1]
 
                     if x1<0 or x1>=self.rows or y1<0 or y1>=self.cols: #leads out of the maze area
-                        row += '%d %d 1' %(self.end, bad_reward)
+                        row += '%d %d 1' %(end_st, bad_reward)
                         continue
 
                     if self.grid[x1,y1] == 1: #leading into a wall
-                        row += '%d %d 1' %(self.end, bad_reward)
+                        row += '%d %d 1' %(end_st, bad_reward)
                         continue
                     
                     idx1 = self.encode[(x1,y1)]
                     row += '%d '%idx1
 
-                    if idx1 == self.end: #leading to final state
+                    if idx1 in self.en_end: #leading to final state
                         row += '%d 1' %good_reward
                     else: #leading to an empty cell
                         row += '%d 1' %normal_reward
@@ -222,7 +224,7 @@ class Maze:
         policy = policy[:, 1].astype(int)
         path = np.empty(self.nstates, dtype = str)
         vis = np.zeros(self.nstates , dtype = bool)
-        nxt = [self.decode[self.start]]
+        nxt = [self.start[0]]
 
         while nxt:
 
@@ -230,7 +232,7 @@ class Maze:
             ev = self.encode[v]
             vis[ev] = True
             
-            if ev == self.end: break
+            if ev in self.en_end: break
             a = self.actions[policy[ev]]
             x, y = v[0] + a[0], v[1] + a[1]
             ch = self.encode[(x,y)]
@@ -242,13 +244,17 @@ class Maze:
             path[ch] = self.action_map[policy[ev]]
             nxt.append((x,y))
 
-        if not vis[self.end]: return 'invlaid poicy'
-
+        found = False
+        for e in self.en_end:
+            if vis[e]: ans, found = e, True
+        if not found: return 'invalid policys'
+        # if not vis[self.en_end]: return 'invlaid poicy'
+        
         ret = []
-        v = self.decode[self.end]
-        ev = self.encode[v]
+        ev = ans
+        v = self.decode[ev]
 
-        while ev != self.start:
+        while not ev in self.en_start:
             ret.append(path[ev])
             a = self.actions[self.raction_map[path[ev]]]
             v = (v[0] - a[0], v[1] - a[1])
