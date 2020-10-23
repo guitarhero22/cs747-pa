@@ -1,0 +1,2 @@
+https://github.com/coin-or/pulp/discussions/347
+https://www.coin-or.org/PuLP/index.html

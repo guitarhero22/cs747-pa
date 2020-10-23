@@ -144,7 +144,7 @@ class Maze:
     def __init__(self, mazefile):
         if not mazefile is None:
 
-            self.grid = np.loadtxt(mazefile, int)[1:-1, 1:-1]
+            self.grid = np.loadtxt(mazefile, int)
             self.rows, self.cols = self.grid.shape
             self.start = [i for i in zip(*np.where(self.grid == 2))]
             self.end = [i for i in zip(*np.where(self.grid == 3))]
@@ -166,7 +166,6 @@ class Maze:
             
             self.en_start = [self.encode[i] for i in self.start]
             self.en_end = [self.encode[i] for i in self.end]
-            # print(self.start, self.end)
 
     def write_mdp(self, good_reward = 10000, bad_reward = -10000, normal_reward = -1, discount = 1):
 
