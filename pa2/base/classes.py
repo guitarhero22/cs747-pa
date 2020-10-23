@@ -19,14 +19,14 @@ class Planner:
     def vi_solver(self):
         iters = 1
         V_new = np.max(self.R + np.sum(self.gamma * (self.T * self.V), 2), 1)        
-        while np.linalg.norm(V_new - self.V) > 0.0000001:
+        while np.linalg.norm(V_new - self.V) > 0.00000001:
             self.V = V_new
             V_new = np.max(self.R + np.sum(self.gamma * (self.T * self.V), 2), 1)
             iters += 1
         self.P = np.argmax(self.R + np.sum(self.gamma * (self.T * self.V), 2), 1)
         return (iters, self.V, self.P)
     
-    def solve_V(self, P, method = 'vi', tol = 0.000001):
+    def solve_V(self, P, method = 'vi', tol = 0.00000001):
 
         T = self.T[self.states, self.P, :]
         R = self.R[self.states, self.P, :]
