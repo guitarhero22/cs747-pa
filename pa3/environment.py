@@ -51,17 +51,16 @@ class WindyGridworld:
             self.winds[0] = 0
             self.winds[-1] = 0
         if stochastic:
-            self.act = self.act_stochastic
+            self.blow = self.blow_stochastic
         else:
-            self.act = self.act_deterministic
+            self.blow = self.blow_deterministic
         return
 
 
-    def visualize(self):
+    def visualize(self, plot = True):
 
         sz = 1
         plt.axes()
-
         for i in range(self.rows + 1):
             i = i * sz
             line = plt.Line2D((0,self.cols * sz), (i, i), lw = 2.5)
@@ -81,24 +80,34 @@ class WindyGridworld:
             i = (i[0]*sz, i[1]*sz)
             patch = plt.Rectangle((i[1], i[0]), sz, sz, fc='r')
             plt.gca().add_patch(patch)
-        
         plt.xticks([i*sz + sz*0.5  for i in range(self.cols)],self.winds)
         plt.gca().tick_params(axis = u'both', which = u'both', length = 0)
         plt.yticks([],[])
         plt.axis('scaled')
-        plt.show()
+        if plot:
+            plt.show()
 
-    def act_stochastic(self):
-        pass
+    def blow_stochastic(self, wind):
+        if wind == 0:
+            return 0
+        r = self.rand.random()
+        if r <= 1/3:
+            return wind - 1
+        if r <= 2/3:
+            return wind
+        return wind + 1
 
-    def act_deterministic(self, curpos, action):
+    def blow_deterministic(self, wind):
+        return wind
+        
+    def act(self, curpos, action):
         
         if isinstance(action, str):
             action = self.map[action]
         else:
             action = self.add[action]
 
-        r, c = curpos[0] + action[0] + self.winds[curpos[1]], curpos[1] + action[1]
+        r, c = curpos[0] + action[0] + self.blow(self.winds[curpos[1]]), curpos[1] + action[1]
 
         if r < 0:
             r = 0
@@ -115,6 +124,15 @@ class WindyGridworld:
             reward = 1
 
         return reward, (r,c) 
+
+    def trace_path(self, path):
+        sz = 1
+        self.visualize(False)
+        for i in path:
+            i = (i[0]*sz, i[1]*sz)
+            patch = plt.Rectangle((i[1], i[0]), sz, sz, fc='y')
+            plt.gca().add_patch(patch)
+        plt.show()
 
 if __name__ == '__main__':
     
